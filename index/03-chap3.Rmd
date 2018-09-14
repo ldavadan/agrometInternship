@@ -12,7 +12,7 @@ load("./data/env_report.RData")
 
 # Modeling with machine learning methods {#model}
 
-Once the dataset is ready, the next step is to model spatial predictions of temperature. To do that, machine learning is used through R.
+Once the dataset is ready, the next step is to model spatial predictions of temperature. Two approaches can be used. Either physical models or Machine learning. My mentor and the project leaders have chosen the machine learning approach because it is easier to implement than physical models for which a deep understanding of the equations governing all the physical processes involved in the definition of the temperature at a specific point in the space an time is required.
 
 ## Principle of machine learning
 
@@ -52,7 +52,7 @@ Here is our approach :
 
 We choose a weather parameter to predict, it is our __target__. In the context of my internship, _temperature_ is my target variable.
 
-Then, from the historical dataset of hourly weather records from PAMESEB database, a representative subset of records is filtered. Stations are filtered to only keep the useful ones which are active. For each hourly set of records, a benchmark experiment is run with multiple linear regression algorithm, the __learner__, applied to various regression __tasks__, i.e. the target response variable (temperature) and all the chosen __explanatory variables__ (elevation, slope, land cover...). The different combinations of explanatory variables using multiple linear regression algorithm are compared and ranked using a __cross-validation resampling strategy__. Several methods exist but we will use the Leave-One-Out cross-validation method (LOOCV). It consists to establish, for each hourly dataset, a model based on every weather stations except one which will be the one where the model is tested to compute the error and then doing it again as many times as the number of weather stations. Performance metrics (RMSE and MAE) have been stored for each of these iterations.
+Then, from the historical dataset of hourly weather records from PAMESEB database, a representative subset of records is filtered. Stations are filtered to only keep the useful ones which are active. For each hourly set of records, a benchmark experiment is run with multiple linear regression algorithm, the __learner__, applied to various regression __tasks__, i.e. the target response variable (temperature) and all the chosen __explanatory variables__ (elevation, slope, land cover...). The different combinations of explanatory variables using multiple linear regression algorithm are compared and ranked using a __cross-validation resampling strategy__. Several methods exist but we will use the Leave-One-Out cross-validation method (LOOCV). It consists to establish, for each hourly dataset, a model based on every weather stations except one which will be the one where the model output will be compared to the observation to compute the error. this procedure is repated iteratively on each station. Model performance metrics (RMSE and MAE) are stored for each of these iterations.
 
 &nbsp;
 
@@ -81,9 +81,9 @@ The entire methodology is detailed in the _Appendix A_ (Spatialization methodolo
 
 ## Machine Learning in R
 
-All of our work is done using R. Moreover, a R package which provides the infrastructure to run machine learning is available. This package **mlr** is very complete to build models, make predictions and evaluate performances.
+All of our work is done using R. Moreover, a R package which provides the infrastructure to run machine learning is available. This package, **mlr**, is very complete to build models, make predictions and evaluate performances.
 
-Machine learning in R offers a common and simplified interface for all statistical methods implemented in the package. With this package, run a benchmark with several statistical methods can be done on data from a period. This benchmark returns a lot of informations :
+Machine learning in R offers a common and simplified interface for all statistical methods implemented in the package. With this package, running a benchmark that compares several statistical methods, i.e. a set of combinations of learners and explanatory variables, can easily be performed on a large dataset covering a long period of hourly records. This benchmark returns a lot of information :
 
 - about learners and task descriptions used in the benchmark
 - about models, test performance values, predictions from the benchmark

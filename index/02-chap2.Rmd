@@ -21,7 +21,7 @@ Temperature is the target variable concerned by my internship.
 
 ## Explanatory variables
 
-As a reminder, the purpose of my internship was to implement the multiple linear regression algorithm as a spatialization method. This means that I need to find an equation where the target variable can be modeled from one or more explanatory variables. The equation will have the form : $Y = b_0 + b_1.X_1 + b_2.X_2 + ... + b_n.X_n$ where $Y$ is the response variable and $X_n$ your $n$ explanatory variables related to their estimated parameter $b_n$.
+As a reminder, the purpose of my internship was to implement the multiple linear regression algorithm as a spatialization method. This means that, for each set of hourly records from the network of stations, I need to find an equation where the target variable can be modeled from one or more explanatory variables. The equation will have the form : $Y = b_0 + b_1.X_1 + b_2.X_2 + ... + b_n.X_n$ where $Y$ is the response variable and $X_n$ your $n$ explanatory variables related to their estimated parameter $b_n$.
 
 These explanatory variables which have an influence on temperature are already known and some academic papers already have dealt with them (Zeuner 2007, Janssen 2011). 
 
@@ -49,9 +49,9 @@ CORINE Land Cover is divided in 47 different land covers. 26 of them are found i
 
 &nbsp;
 
-R can handle different two types of spatial data : vector and raster. Vector model is based on points inside a CRS. Vector data can be points or lines or polygons. In R, `sp` and `sf` packages can handle this data type. The major difference between `sp` and `sf` is that `sf` objects can be treated as data frames in most operations and has better performances (Lovelace 2018). Raster model is based on a matrix representing equally spaced pixels and contains informations about the CRS, the extent and the origin. `raster` package handles this data type. These three packages can work together to convert data from a type to another one.
+R handles the two types of spatial data : vector and raster. Vector model is based on points inside a CRS. Vector data can be points or lines or polygons. In R, `sp` and `sf` packages can handle this data type. The major difference between `sp` and `sf` is that `sf` objects can be treated as data frames in most operations and has better performances (Lovelace 2018). Raster model is based on a matrix representing equally spaced pixels and contains informations about the CRS, the extent and the origin. `raster` package handles this data type. These three packages can work together to convert data from a type to another one.
 
-CORINE land cover data downloaded on the geo-portal was a shapefile, i.e. vector data, with WGS84 CRS. This geographic CRS has coordinates expressed in degrees. Then, to read them in R, `sp` is necessary but a conversion to `sf` was prefered for clustering for the reasons given above.
+CORINE land cover data downloaded on the geo-portal was a shapefile, i.e. vector data, with WGS84 CRS. This geographic CRS has coordinates expressed in degrees. Then, to read them in R, `sp` was necessary but I converted data to `sf` format because this package facilitates the handling for data clustering in classes.
 
 A conversion of CRS was also done from WGS84 to Belgian Lambert 2008. In contrast to WGS84, Lambert 2008 is a projected CRS expressed in meters. It facilitates our work to characterize the surrounding environment of the stations defining buffers around them. A projected CRS facilitates the definition of the radius of the buffer using meters instead of degrees.
 
@@ -84,7 +84,7 @@ Data are recovered from **EUMETSAT**, the European Organisation for the Exploita
 
 There are 875 points distributed in Wallonia where records are available, this is not sufficient in our case where the objective is to provide predictions with a precision of 1 km². The handle of these spatial data with R packages was necessary to spatialize the records. To do that, the IDW spatial interpolation method was used.
 
-These data are available from 2015-11-11. As a consequence, models built before this date do not use solar irradiance as explanatory variable. However, solar irradiance is an interesting explanatory variable, that's why no model was built before this date for my internship.
+These data are available from 2015-11-11. As a consequence, models built before this date do not use solar irradiance as explanatory variable. However, solar irradiance is an interesting explanatory variable, that's why no model was benchmarked before this date for my internship.
 
 In parallel with that, PAMESEB stations also measure solar irradiance. But only 27 stations are useable. The measures from weather stations are used to build models from physical stations whereas the EUMETSAT measures will be used later for the spatialization on the spatial grid of Wallonia.
 
@@ -102,13 +102,13 @@ Once all the data are available, an important task is to organize them to perfor
 
 Our choice turned to the use of the `mlr` package because it provides an interface for machine learning using a lot of statistical methods. The objective of data preparation is to make our data mlr-compliant because the package needs data with a specific structure. In particular, I needed to organize data to have one line for each station containing values for every explanatory variable. Moreover, this organisation must be done for every hour.
 
-The first step consists of grouping data. Static and dynamic variables are grouped in a data frame. Then, to reduce time computation and to prepare the integration of the data frame for the modeling, there is a way to nest data frames with the library purrr. In this way, it is possible to have one single row for each hour but every row contains data frames inside. The Figure \@ref(fig:nested) shows how it looks. This nested data frame is a efficient way to manipulate many sub-tables at once.
+The first step consists of grouping data. Static and dynamic variables are grouped in a data frame. Then, to reduce computation time and to prepare the integration of the data frame for the modeling task, there is a way to nest data frames with the library purrr. In this way, it is possible to have one single row for each hour but every row contains data frames inside. The Figure \@ref(fig:nested) shows how it looks. This nested data frame is a efficient way to manipulate many sub-tables at once.
 
 ```{r nested, echo=FALSE, fig.cap="Structure of a nested data frame", out.width="50%", fig.align='center'}
 include_graphics(path = "figure/purrr_nest.png")
 ```
 
-In the case of the project, the nested data frame contains one row for each hour which has a data frame containing data from each station at this time. In the Table \@ref(tab:ndf), there is a preview of the data frame contained into each row.
+In the case of the project, the nested data frame contains one row for each hour which in turns contains a nested data frame holding the data from all the stations for this hour. In the Table \@ref(tab:ndf), there is a preview of the data frame contained into each row.
 
 ```{r ndf, echo=FALSE, message=FALSE}
 knitr::kable(head(data.n.sample), caption = "Example of nested data frame in a row corresponding to 2016-05-19 15:00:00") %>%

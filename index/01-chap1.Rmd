@@ -67,7 +67,7 @@ The project was inspired by several academic papers dealing with spatial interpo
 
 ### Objectives
 
-The project aims to set up an operational web-platform designed for real-time agro-meteorological data dissemination at high spatial (1km2) and temporal (hourly) resolution. To achieve the availability of data at such a high spatial resolution, we plan to "spatialize" the real-time data sent by more than 30 connected physical weather stations belonging to the PAMESEB and RMI networks. This spatialization will then result in a gridded dataset corresponding to a network of 17 000 virtual stations uniformly spread on the whole territory of Wallonia.
+The project aims to set up an operational web-platform designed for real-time agro-meteorological data dissemination at high spatial (1km2) and temporal (hourly) resolution. To achieve the availability of data at such a high spatial resolution, we plan to "spatialize" the real-time data sent by more than 30 connected physical weather stations belonging to the PAMESEB and RMI networks. This spatialization will then result in a gridded dataset corresponding to a network of 16 000 virtual stations uniformly spread on the whole territory of Wallonia.
 
 These "spatialized" data will be made available through a web-platform providing interactive visualization widgets (maps, charts, tables and various indicators) and an API allowing their use on the fly, notably by agricultural warning systems providers. An extensive and precise documentation about data origin, geo-statistic algorithms used and uncertainty will be also available.
 
@@ -105,7 +105,7 @@ Two workpackages were clearly defined for my internship :
 
 I used R because it is a free software for statistical computing and graphics. Spatial data were collected from different sources and involved the use of specific R libraries to manipulate them. I needed to handle these libraries to manipulate vector and raster geodata. Then, these data have been organised with the tidyverse library to respond to the structure imposed by the chosen modeling library and to help reduce computation time. The modeling library used is mlr, dealing with machine learning algorithms, responds to a special architecture and logic that I needed to understand. Then, the data have been integrated to build models through a benchmark and analysis. Visualization was done thanks to a plotting system for R, ggplot2, able to create graphics and maps.
 
-The benchmark was run on two large years (from 2015-11-11 to 2018-06-30) because some data were not available before this period.
+The benchmark was run on two large years (from 2015-11-11 to 2018-06-30) because some data were not yet available before this period.
 
 
 ## About the working environment
@@ -141,7 +141,7 @@ The current development version of the AGROMET platform already offers an **API*
 
 Among the different programming languages, R has been chosen because it is is a free software environment for statistical computing and graphics. It is adapted to data analysis because R was developed by statisticians and easy to use even for people without programming skills. R has a large community to help people to solve bugs and problems and packages are well documented.
 
-**Docker** is a software for containerizing platforms. This container approach has many advantages compares to the use of virtual machines : lightweight, quick and modular.
+**Docker** is a software for containerizing platforms. This container approach has many advantages compared to the use of virtual machines : lightweight, quick and modular. Moreover, Docker facilitates reproducible science because with a single pull command of the container, anyone gets the exact same working environment.
 
 There are two main reasons to use R in conjunction with Docker. First, it allows you to quickly and easily share your work whatever the OS and R configuration of your collaborators. Second, it allows you to work in an isolated environment. This means that you will never pollute your OS and e.g. run in time-consuming re-installation procedures due to broken configuration. In case of OS crash, simply relaunch your Docker R container with a single command and you are ready to work.
 

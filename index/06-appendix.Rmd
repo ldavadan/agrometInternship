@@ -53,9 +53,13 @@ include_graphics(path = "figure/2018-03-07_14.png")
 
 - EUMETSAT : [https://landsaf.ipma.pt/en/products/longwave-shortwave-radiation/dssf/](https://landsaf.ipma.pt/en/products/longwave-shortwave-radiation/dssf/)
 
+- Differences between machine learning and physical models approaches : [https://medium.com/@ageitgey/machine-learning-is-fun-80ea3ec3c471](https://medium.com/@ageitgey/machine-learning-is-fun-80ea3ec3c471)
+
 - Machine Learning Mastery Blog : [https://machinelearningmastery.com/supervised-and-unsupervised-machine-learning-algorithms/](https://machinelearningmastery.com/supervised-and-unsupervised-machine-learning-algorithms/)
 
 - Machine Learning in R : [http://mlr-org.github.io/mlr/index.html](http://mlr-org.github.io/mlr/index.html)
+
+- Data classification : [https://gisgeography.com/choropleth-maps-data-classification/](https://gisgeography.com/choropleth-maps-data-classification/)
 
 # Structure of the code using mlr package
 

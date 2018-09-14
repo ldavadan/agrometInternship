@@ -18,31 +18,31 @@ load("./data/env_report.RData")
 
 ### Methodology
 
-In the case of the project, a benchmark is an analysis where the objective is to compare and rank the different combinations of tasks and learners.
+A LOOCV strategy of the multiple linear regression learning algorithm has been applied to each set of hourly records. The aim is to assess combinations of explanatory variables provides, on average, the best spatial predictions. This is achieved by comparing and ranking the various combinations of explanatory variables with respect to their performance measures (MAE and RMSE) averaged on the whole set of hourly records. Hence we actually end up with a so-called mlr benchmark experiment that is run on each set of hourly records.
 
-To realize this benchmark, data from 2015-11-11 00:00:00 to 2018-06-30 00:00:00 were used. The objective is to run a benchmark on 5 years of data but at this moment, solar irradiance data from EUMETSAT were not available before this date. Here, the dataset has 23089 hours.
+The initial objective was to run these benchmarks on 5 years of data to establish which combination of explanatory variables provides, on average, the best predictions. But at this moment, solar irradiance data from EUMETSAT was not available for the whole period. These benchmarks were therefore performed on 23089 sets of hourly records from 2015-11-11 00:00:00 to 2018-06-30 00:00:00 (the period for which the solar data is already available).
 
 &nbsp;
 
 The learners were defined with filter methods implemented in `mlr`. These filter methods are applied to a statistical algorithm (multiple linear regression) to choose explanatory variables using conditions. The different conditions used to filter explanatory variables are the following :
 
 - for each hourly dataset, linear correlation with temperature is computed for every explanatory variable. Other filter methods are available (chi-squared, anova...) but linear correlation seems to be the most relevant one for a regression problem.
-- then, explanatory variables are kept according to conditions : variables with the best hourly linear correlation with temperature (the number of variables to keep is specified) or all the variables which have a linear correlation greater than a value from 0 to 1.
+- then, explanatory variables are kept according to conditions : variables with the best hourly linear correlation with temperature (the number of variables to keep is specified) or all the variables which have a linear correlation greater than a specific value from 0 to 1.
 - I can also choose explanatory variables that I want to build models regardless of their linear correlation
 
 All these filter methods where applied to **Multiple Linear Regression** learner in the case of my internship.
 
 &nbsp;
 
-The Table \@ref(tab:explvar) shows the different combinations compared using filter methods.
+The Table \@ref(tab:explvar) shows the different combinations that were created using filter methods.
 
 &nbsp;
 
-The benchmark performs for every hour and filter methods are applied each time. As a consequence, linear correlation computation is hourly done and `mlr` choose automatically the variables using the filter methods. Then, based on this hourly computation, the combination of explanatory variables can be different from one hour to another.
+Because a benchmark is performed on each set of hourly records, computation of the linear correlation is also performed on an hourly basis scale and mlr choose automatically the variables using the filter methods. Thus, it must be stressed out that the selected combination of explanatory variables may differ from one hour to another.
 
 &nbsp;
 
-The benchmark took about 30 hours, i.e. 3 hours per method. Computations are very long and results are very large. Each method represents more than 1 Gigabyte of data.
+Performing the benchmarks on the 23089 sets of hourly records took about 30 hours, i.e. 3 hours per method. Computations are very long and results are very large. Each method represents more than 1 Gigabyte of data.
 
 ```{r explvar, echo=FALSE}
 explvar = data.frame(Statistical_Method = c("Multiple Linear Regression", "Multiple Linear Regression", "Multiple Linear Regression", "Multiple Linear Regression", "Multiple Linear Regression", "Multiple Linear Regression", "Multiple Linear Regression", "Multiple Linear Regression", "Multiple Linear Regression", "Multiple Linear Regression"),
@@ -56,19 +56,19 @@ knitr::kable(explvar, caption = "Combination of explanatory variables used") %>%
 
 ### Comparison of methods
 
-Once benchmark results are available, comparison of methods is possible. This comparison is based on the error of measures. In our case, RMSE and MAE were computed because they both express average model prediction error in units of the variable of interest. Both metrics can range from 0 to $\infty$ and are indifferent to the direction of errors. They are negatively-oriented scores, which means lower values are better.
+Once the 23089 benchmarks are performed, we can compare their outputs averaged on the whole period. This comparison is based on the error of measures. In our case, RMSE and MAE were computed because they both express average model prediction error in units of the variable of interest. Both metrics can range from 0 to $\infty$ and are indifferent to the direction of errors. They are negatively-oriented scores, which means lower values are better.
 
 Since the errors are squared before they are averaged, the RMSE gives a relatively high weight to large errors. This means the RMSE is more useful because large errors are particularly undesirable in the project. (Chai, 2014)
 
 &nbsp;
 
-From the 10 methods compared, MAE and RMSE are computed and compared. The results are shown in the Figure \@ref(fig:meanerror). In this case, they both have the same behaviour. Indeed, they both return the same ranking of the methods and they both show methods which stand out from the other ones.
+The figure \@ref(fig:meanerror) shows the averaged RMSE and MAE for the 10 methods implemented. The two metrics both return the same ranking of the methods and they both show methods which stand out from the other ones.
 
-Multiple linear regression using coordinates to build models has a large error, this combination is not relevant to spatially predict temperature in Wallonia. Multiple linear regression using explanatory variables whose their linear correlations with temperature is greater than 0.3 has an error larger than the other methods too, this filter method is too flexible to return valid spatial predictions. A few methods have a similar error. In particular, that is the case when too many variables are chosen to build models.
+The method only using coordinates, i.e. longitude and latitude, to build models has a large error, this combination is not relevant to spatially predict temperature in Wallonia. The method using explanatory variables with a linear correlation with temperature greater than 0.3 has an error larger than the other methods too, this filter method is not selective enough to return valid spatial predictions. A few methods have a similar error. In particular, that is the case when 4 variables are chosen to build models.
 
 &nbsp;
 
-Among the three best methods, one is better than the others. This is the models built from an equation using longitude, latitude and altitude as explanatory variables. Tests realized on two months of data have already shown that altitude is a powerful explanatory variable. The two other methods are based on the hourly computation of the linear correlations with temperature, with or without solar irradiance as mandatory variable and keeping the 2 other best variables have a similar error. However, in spite of their larger error, they can be interesting because the equation is dynamic throughout hours and, in this way, the models are adapted to the evaluated hour.
+Among the 3 methods that, on average, perform the best, the one that builds the spatial prediction models with longitude, latitude and altitude as explanatory variables, provides the lowest errors. The two other methods are based on the hourly computation of the linear correlations with temperature, with or without solar irradiance as mandatory variable and keeping the 2 other best variables have a similar error. However, in spite of their larger error, they can be interesting because the equation is dynamic throughout hours and, in this way, the models are adapted to the evaluated hour.
 
 ```{r meanerror, echo=FALSE, fig.cap="Errors (RMSE and MAE) of methods", out.width="100%", fig.align='center'}
 include_graphics(path = "figure/meanerror.png")
@@ -90,7 +90,7 @@ This barchart corroborates the precedent graph. The method based on coordinates 
 include_graphics(path = "figure/barchart.png")
 ```
 
-For each hour, the equation of the model is computed. They can be extracted from the benchmark. The Table \@ref(tab:models) shows the structure of the equations in the case where explanatory variables can be different from one hour to another (lm.2bestsVar). The table also shows what are the best variables and display the related error.
+`mlr` benchmark allows to extract the equations of the computed models. This is useful if we want to build spatialized temperature maps. The Table \@ref(tab:models) shows an example of the structure of the equations in the case where explanatory variables can be different from one hour to another (lm.2bestsVar). The table also shows what are the best variables and display the related error.
 
 ```{r models, echo=FALSE, fig.cap="Models with their equations"}
 knitr::kable(models.sample, caption = "Models with their equations") %>%
@@ -100,17 +100,17 @@ knitr::kable(models.sample, caption = "Models with their equations") %>%
 
 ### Visualization
 
-These models can be observed on maps. For that purpose, functions building maps have been made with ggplot2 library from R for static maps and leaflet library for interactive maps.
+Spatial predictions built upon these models can be shown on maps. For that purpose, functions building maps have been made with ggplot2 library from R for static maps and leaflet library for interactive maps.
 
-Models built from physical stations data are applied to the 1 km² grid cells. Then, the temperature is mapped with a color palette similar to the one of RMI. Class breaks are based on quantiles of temperature values. Standard error is computed for each cell and it is shown on the map with a white layer which has different levels of transparency according to the error. A large standard error is related to an opacity and vice-versa.
+Models built from physical stations data are applied to the 1 km² grid cells. Then, the spatialized temperature is mapped with a color palette similar to the one of RMI. Class breaks are based on quantiles of temperature values. Standard error is computed for each cell and it is shown on the map with a white layer which has different levels of transparency according to the error. A large standard error is related to an opacity and vice-versa. This transparency trick to display the attached standard error was inspired from the article of Hengl (2011) which explains the uncertainty of the prediction at each interpolation point.
 
-The Figure \@ref(fig:map) shows an output for one hour based on the method where explanatory variables are Solar irradiance and the 2 variables with the best linear correlation with temperature. To build this map, some objects are needed : an object containing data (temperature and standard error) for the grid and a spatial vector object containing boundaries of Wallonia, but also the name of the variable to display. Then, some conditions can be chosen, like the display of the layer containing error, the display of the legend for error, the way to build the legend and its classes. Some arguments enable to customize the map with titles and comments. The function is thus reusable for other usages. For example, the function builds maps spatializing hydric deficit in Wallonia.
+The Figure \@ref(fig:map) shows an example of output that I can produce for one hour based on the method where explanatory variables are Solar irradiance and the 2 variables with the best linear correlation with temperature. To build this map, some objects are needed : an object containing data (temperature and standard error) for the grid and a spatial vector object containing boundaries of Wallonia, but also the name of the variable to display. Then, some conditions can be chosen, like the display of the layer containing error, the display of the legend for error, the way to build the legend and its classes. Some arguments enable to customize the map with titles and comments. The function is thus reusable for other usages. For example, this function has also been used to build maps of spatialized hydric deficit in Wallonia during this year summer drought.
 
-The choice I made was to use quantiles to make class breaks because that is more relevant than homogeneous breaks.
+The choice I made was to use quantiles to make class breaks because that is more relevant than homogeneous breaks. Indeed, the last one has an unequal count of 1 km² cells per grid whereas groups made with quantile classification have the same quantity. A reference about the difference between these classifications is available in _Appendix C_
 
-The figure shows 2 maps. The one on the left is the map with spatialization of temperature, the right one has the layer with error on the temperature layer. It is possible to see regions where errors are more important.
+The figure shows 2 maps. The map on the left shows the spatialized temperature. The map on the right shows the spatialized temperature combined with the standard error (uncertainty) of the prediction. It is possible to see larger errors in the Ardennes, in the Meuse river valley near to Liège and in the east of Hainaut province.
 
-```{r map, echo=FALSE, fig.cap="Example of an output for 2018-05-02 14:00:00 (left : without error ; right : with error)", out.width="100%"}
+```{r map, echo=FALSE, fig.cap="Example of an output for 2018-05-02 14:00:00 (left : without standard error ; right : with standard error)", out.width="100%"}
 include_graphics("figure/maperror.png")
 ```
 
@@ -120,7 +120,7 @@ This figure shows the output based on a model depending on the method where expl
 T = 15.59716 + -0.00629 \times Elevation + -0.00197 \times Herbaceous + 0.00206 \times SolarIrradiance
 \]
 
-These maps show whether the models are relevant. The _Appendix B_ shows maps made with all methods for one hour. These maps show differences in the relevance of each model. For example, the model depending on longitude and latitude is very simplistic compared to the others. The other models are more similar but show that some of them are more reliable because the error is smaller. The better model is the second one on the first row. It is corresponding to the the model depending on longitude, latitude and elevation. For this hour, the better model is the following :
+The _Appendix B_ shows exemplative maps made with all methods for one hour. These maps show differences in the relevance of each model. For example, the model depending on longitude and latitude is very simplistic compared to the others. The other models are more similar but show that some of them are more reliable because the standard error is smaller. The better model is the second one on the first row. It is corresponding to the the model depending on longitude, latitude and elevation. For this hour, the equation of the best model is :
 \[
 T = -9.375042 + -0.010431 \times Elevation + 1.02e-05 \times Longitude + 1.59e-05 \times Latitude
 \]
@@ -129,7 +129,7 @@ Longitude and latitude are expressed in meters because the CRS used is Belgian L
 
 ## Discussion
 
-As a reminder, the objective of the project is to provide weather predictions. These predictions will feed decision support tools to monitor crop diseases like potato late blight and to operate in fields at the right times.
+As a reminder, the objective of the project is to provide spatialized weather data with the lowest uncertainty and the lowest prediction error in the agricultural areas of Wallonia. These predictions will feed decision support tools to monitor crop diseases like potato late blight and to operate in fields at the right times.
 
 ```{r rmi, echo=FALSE, fig.cap="Precipitations, temperatures and insolation, annual values", out.width="100%", fig.align='center'}
 include_graphics(path = "figure/rmi_climate_data.png")
@@ -143,7 +143,7 @@ Even if visualization of outputs is not the main objective of the project, the c
 
 &nbsp;
 
-Models were built with some explanatory variables but they may be insufficient. Adding new variables like temperature predictions from RMI could improve models. Only 27 stations are used to build these models, adding RMI stations network could be a solution to improve models too. However, weather stations from different networks have differences in their measures, checking interoperability is very important for that and making corrections is essential.
+Models were built with some explanatory variables but they may be insufficient. Adding new variables like temperature predictions from RMI could improve models. Only 27 stations are used to build these models, adding new variables like next hour temperature predictions from RMI could improve models too. However, weather stations from different networks have differences in their measures, checking interoperability is very important for that and making corrections is essential.
 
 &nbsp;
 
@@ -163,4 +163,5 @@ With the aim to provide data for agronomic utilisation, there is an interest to 
 
 &nbsp;
 
-Assuming that no other models will be better than those presented, there will be a question of transparency for the project. In that way, models will be clearly presented. If one static model is chosen for predictions, this will be clear and transparent. But if the chosen method is a dynamic one, using computation every hour, the method used for each hour could be different, and that will have to be mentioned.
+Rather than choosing the best spatial prediction method on average to perform the hourly spatialization, we could also decide to choose, for each hourly spatialization, the best method according to the benchmark even if this method could be different for each hour. This would not be a problem as long as the methodology is transparent.
+
